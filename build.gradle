@@ -45,6 +45,18 @@ subprojects {
     }
 
     jar {
+        enabled = true
+    }
+}
+
+configure(subprojects.findAll {
+    it.path.startsWith(':service:') && it.path != ':service'
+}) {
+    bootJar {
+        enabled = true
+    }
+
+    jar {
         enabled = false
     }
 }
