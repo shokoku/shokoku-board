@@ -22,7 +22,7 @@ public class DataInitializer {
   @Autowired
   TransactionTemplate transactionTemplate;
   Snowflake snowflake = new Snowflake();
-  CountDownLatch latch = new CountDownLatch(BULK_INSERT_SIZE);
+  CountDownLatch latch = new CountDownLatch(EXECUTE_COUNT);
 
   static final int BULK_INSERT_SIZE = 2000;
   static final int EXECUTE_COUNT = 6000;
