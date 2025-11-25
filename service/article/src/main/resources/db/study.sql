@@ -14,3 +14,5 @@ explain select board_id, article_id from article where board_id = 1 order by art
 explain select * from (select article_id from article where board_id = 1 order by article_id desc limit 30 offset 1499970) t left join article on t.article_id = article.article_id;
 
 explain select * from (select article_id from article where board_id = 1 order by article_id desc limit 30 offset 8999970) t left join article on t.article_id = article.article_id;
+
+explain select count(*) from (select article_id from article where board_id = 1 limit 300301) t;
