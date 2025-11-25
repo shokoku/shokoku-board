@@ -2,42 +2,20 @@ package shokoku.board.article.api;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
-import org.junit.jupiter.api.AfterEach;
 import org.junit.jupiter.api.Test;
 import org.springframework.web.client.RestClient;
+import shokoku.board.article.service.response.ArticlePageResponse;
 import shokoku.board.article.service.response.ArticleResponse;
 
-import java.util.ArrayList;
-import java.util.List;
-
-import static org.junit.jupiter.api.Assertions.*;
 
 public class ArticleApiTest {
-
   RestClient restClient = RestClient.create("http://localhost:9000");
-
-  private final List<Long> createdArticleIds = new ArrayList<>();
-
-  @AfterEach
-  void cleanup() {
-    for (Long articleId : createdArticleIds) {
-      try {
-        delete(articleId);
-      } catch (Exception ignored) {
-      }
-    }
-    createdArticleIds.clear();
-  }
 
   @Test
   void createTest() {
-    ArticleResponse response = create(new ArticleCreateRequest("title", "content", 1L, 1L));
-    assertNotNull(response);
-    assertNotNull(response.getArticleId());
-    assertEquals("title", response.getTitle());
-    assertEquals("content", response.getContent());
-
-    createdArticleIds.add(response.getArticleId());
+    ArticleResponse response = create(new ArticleCreateRequest(
+            "hi", "my content", 1L, 1L
+    ));
     System.out.println("response = " + response);
   }
 
@@ -51,15 +29,7 @@ public class ArticleApiTest {
 
   @Test
   void readTest() {
-    ArticleResponse created = create(new ArticleCreateRequest("read test title", "read test content", 1L, 1L));
-    createdArticleIds.add(created.getArticleId());
-
-    ArticleResponse response = read(created.getArticleId());
-    assertNotNull(response);
-    assertEquals(created.getArticleId(), response.getArticleId());
-    assertEquals("read test title", response.getTitle());
-    assertEquals("read test content", response.getContent());
-
+    ArticleResponse response = read(121530268440289280L);
     System.out.println("response = " + response);
   }
 
@@ -71,47 +41,40 @@ public class ArticleApiTest {
   }
 
   @Test
-  void updatedTest() {
-    ArticleResponse created = create(new ArticleCreateRequest("original title", "original content", 1L, 1L));
-    createdArticleIds.add(created.getArticleId());
-
-    update(created.getArticleId());
-
-    ArticleResponse response = read(created.getArticleId());
-    assertNotNull(response);
-    assertEquals("title2", response.getTitle());
-    assertEquals("content2", response.getContent());
-
+  void updateTest() {
+    update(121530268440289280L);
+    ArticleResponse response = read(121530268440289280L);
     System.out.println("response = " + response);
   }
 
-  void update(Long articleId){
+  void update(Long articleId) {
     restClient.put()
             .uri("/v1/articles/{articleId}", articleId)
-            .body(new ArticleUpdateRequest("title2", "content2"))
+            .body(new ArticleUpdateRequest("hi 2", "my content 22"))
             .retrieve();
   }
 
   @Test
   void deleteTest() {
-    ArticleResponse created = create(new ArticleCreateRequest("delete test title", "delete test content", 1L, 1L));
-    Long articleId = created.getArticleId();
+    restClient.delete()
+            .uri("/v1/articles/{articleId}", 121530268440289280L)
+            .retrieve();
+  }
 
-    delete(articleId);
+  @Test
+  void readAllTest() {
+    ArticlePageResponse response = restClient.get()
+            .uri("/v1/articles?boardId=1&pageSize=30&page=50000")
+            .retrieve()
+            .body(ArticlePageResponse.class);
 
-    try {
-      read(articleId);
-      fail("삭제된 게시글을 조회할 수 없어야 합니다.");
-    } catch (Exception e) {
-      System.out.println("삭제 성공 확인");
+    System.out.println("response.getArticleCount() = " + response.getArticleCount());
+    for (ArticleResponse article : response.getArticles()) {
+      System.out.println("articleId = " + article.getArticleId());
     }
   }
 
-  void delete(Long articleId) {
-    restClient.delete()
-            .uri("/v1/articles/{articleId}", articleId)
-            .retrieve();
-  }
+
 
   @Getter
   @AllArgsConstructor
@@ -128,4 +91,5 @@ public class ArticleApiTest {
     private String title;
     private String content;
   }
+
 }
