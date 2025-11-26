@@ -20,7 +20,7 @@ public class Comment {
   @Id
   private Long commentId;
   private String content;
-  private Long parentContentId;
+  private Long parentCommentId;
   private Long articleId;
   private Long writerId;
   private Boolean deleted;
@@ -30,7 +30,7 @@ public class Comment {
     Comment comment = new Comment();
     comment.commentId = commentId;
     comment.content = content;
-    comment.parentContentId = parentContentId == null ? commentId : parentContentId;
+    comment.parentCommentId = parentContentId == null ? commentId : parentContentId;
     comment.articleId = articleId;
     comment.writerId = writerId;
     comment.deleted = false;
@@ -39,7 +39,7 @@ public class Comment {
   }
 
   public boolean isRoot() {
-    return parentContentId.longValue() == commentId;
+    return parentCommentId.longValue() == commentId;
   }
 
   public void delete() {

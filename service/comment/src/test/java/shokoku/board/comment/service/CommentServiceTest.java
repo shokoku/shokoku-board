@@ -97,7 +97,7 @@ class CommentServiceTest {
 
   private Comment createComment(Long articleId, Long commentId, Long parentCommentId) {
     Comment comment = createComment(articleId, commentId);
-    given(comment.getParentContentId()).willReturn(parentCommentId);
+    given(comment.getParentCommentId()).willReturn(parentCommentId);
     return comment;
   }
 

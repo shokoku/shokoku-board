@@ -22,7 +22,7 @@ public class CommentResponse {
     CommentResponse response = new CommentResponse();
     response.commentId = comment.getCommentId();
     response.content = comment.getContent();
-    response.parentContentId = comment.getParentContentId();
+    response.parentContentId = comment.getParentCommentId();
     response.articleId = comment.getArticleId();
     response.writerId = comment.getWriterId();
     response.deleted = comment.getDeleted();

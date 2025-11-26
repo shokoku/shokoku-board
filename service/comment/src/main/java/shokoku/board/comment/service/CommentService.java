@@ -69,7 +69,7 @@ public class CommentService {
   private void delete(Comment comment) {
     commentRepository.delete(comment);
     if (!comment.isRoot()) {
-      commentRepository.findById(comment.getParentContentId())
+      commentRepository.findById(comment.getParentCommentId())
               .filter(Comment::getDeleted)
               .filter(not(this::hasChildren))
               .ifPresent(this::delete);
