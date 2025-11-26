@@ -12,7 +12,7 @@ public class CommentResponse {
 
   private Long commentId;
   private String content;
-  private Long parentContentId;
+  private Long parentCommentId;
   private Long articleId;
   private Long writerId;
   private Boolean deleted;
@@ -22,7 +22,7 @@ public class CommentResponse {
     CommentResponse response = new CommentResponse();
     response.commentId = comment.getCommentId();
     response.content = comment.getContent();
-    response.parentContentId = comment.getParentCommentId();
+    response.parentCommentId = comment.getParentCommentId();
     response.articleId = comment.getArticleId();
     response.writerId = comment.getWriterId();
     response.deleted = comment.getDeleted();
