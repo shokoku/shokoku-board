@@ -3,8 +3,12 @@ package shokoku.board.comment.api;
 import lombok.AllArgsConstructor;
 import lombok.Getter;
 import org.junit.jupiter.api.Test;
+import org.springframework.core.ParameterizedTypeReference;
 import org.springframework.web.client.RestClient;
+import shokoku.board.comment.service.response.CommentPageResponse;
 import shokoku.board.comment.service.response.CommentResponse;
+
+import java.util.List;
 
 public class CommentApiV2Test {
   RestClient restClient = RestClient.create("http://localhost:9001");
@@ -62,6 +66,59 @@ public class CommentApiV2Test {
     restClient.delete()
             .uri("/v2/comments/{commentId}", 252383777890476032L)
             .retrieve();
+  }
+
+  @Test
+  void readAll() {
+    CommentPageResponse response = restClient.get()
+            .uri("/v2/comments?articleId=1&pageSize=10&page=50000")
+            .retrieve()
+            .body(CommentPageResponse.class);
+
+    System.out.println("response.getCommentCount() = " + response.getCommentCount());
+    for (CommentResponse comment : response.getComments()) {
+      System.out.println("comment.getCommentId() = " + comment.getCommentId());
+    }
+
+    /*
+    response.getCommentCount() = 101
+    comment.getCommentId() = 252383135419572224
+    comment.getCommentId() = 252383136082272256
+    comment.getCommentId() = 252383136161964032
+    comment.getCommentId() = 252383269557608448
+    comment.getCommentId() = 252383269771517952
+    comment.getCommentId() = 252383269826043904
+    comment.getCommentId() = 252383414537920512
+    comment.getCommentId() = 252383414760218624
+    comment.getCommentId() = 252383414802161664
+    comment.getCommentId() = 252383642146021376
+     */
+  }
+
+  @Test
+  void readALlInfiniteScroll() {
+    List<CommentResponse> response1 = restClient.get()
+            .uri("/v2/comments/infinite-scroll?articleId=1&pageSize=5")
+            .retrieve()
+            .body(new ParameterizedTypeReference<List<CommentResponse>>() {
+            });
+    System.out.println("firestPage");
+    for (CommentResponse response : response1) {
+      System.out.println("response.getCommentId() = " + response.getCommentId());
+    }
+
+    String lastPAth = response1.getLast().getPath();
+    List<CommentResponse> response2= restClient.get()
+            .uri("/v2/comments/infinite-scroll?articleId=1&pageSize=5&lastPath=%s".formatted(lastPAth))
+            .retrieve()
+            .body(new ParameterizedTypeReference<List<CommentResponse>>() {
+            });
+    System.out.println("secondPage");
+    for (CommentResponse response : response2) {
+      System.out.println("response.getCommentId() = " + response.getCommentId());
+    }
+
+
   }
 
   @Getter
