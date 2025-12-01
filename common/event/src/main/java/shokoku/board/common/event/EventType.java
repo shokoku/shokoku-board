@@ -18,7 +18,7 @@ public enum EventType {
   COMMENT_DELETED(CommentDeletedEventPayload.class, SHOKOKU_BOARD_COMMENT),
   ARTICLE_LIKED(ArticleLikedEventPayload.class, SHOKOKU_BOARD_LIKE),
   ARTICLE_UNLIKED(ArticleUnlikedEventPayload.class, SHOKOKU_BOARD_LIKE),
-  ARTICLE_VIEWED(ArticleViewEventPayload.class, SHOKOKU_BOARD_VIEW),;
+  ARTICLE_VIEWED(ArticleViewedEventPayload.class, SHOKOKU_BOARD_VIEW),;
 
   private final Class<? extends EventPayload> payloadClass;
   private final String topic;
