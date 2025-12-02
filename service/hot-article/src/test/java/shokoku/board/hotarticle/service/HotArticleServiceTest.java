@@ -14,7 +14,6 @@ import shokoku.board.hotarticle.service.eventhandler.EventHandler;
 import java.util.List;
 import java.util.stream.Stream;
 
-import static org.junit.jupiter.api.Assertions.*;
 import static org.mockito.BDDMockito.given;
 import static org.mockito.Mockito.*;
 
@@ -39,7 +38,7 @@ class HotArticleServiceTest {
   void handleEventIfEventHandlerNotFoundTest() {
     Event event = mock(Event.class);
     EventHandler eventHandler = mock(EventHandler.class);
-    given(eventHandler.support(event)).willReturn(false);
+    given(eventHandler.supports(event)).willReturn(false);
     given(eventHandlers.stream()).willReturn(Stream.of(eventHandler));
 
     hotArticleService.handleEvent(event);
@@ -54,7 +53,7 @@ class HotArticleServiceTest {
     given(event.getType()).willReturn(EventType.ARTICLE_CREATED);
 
     EventHandler eventHandler = mock(EventHandler.class);
-    given(eventHandler.support(event)).willReturn(true);
+    given(eventHandler.supports(event)).willReturn(true);
     given(eventHandlers.stream()).willReturn(Stream.of(eventHandler));
 
     hotArticleService.handleEvent(event);
@@ -69,7 +68,7 @@ class HotArticleServiceTest {
     given(event.getType()).willReturn(EventType.ARTICLE_DELETED);
 
     EventHandler eventHandler = mock(EventHandler.class);
-    given(eventHandler.support(event)).willReturn(true);
+    given(eventHandler.supports(event)).willReturn(true);
     given(eventHandlers.stream()).willReturn(Stream.of(eventHandler));
 
     hotArticleService.handleEvent(event);
@@ -84,7 +83,7 @@ class HotArticleServiceTest {
     given(event.getType()).willReturn(mock(EventType.class));
 
     EventHandler eventHandler = mock(EventHandler.class);
-    given(eventHandler.support(event)).willReturn(true);
+    given(eventHandler.supports(event)).willReturn(true);
     given(eventHandlers.stream()).willReturn(Stream.of(eventHandler));
 
     hotArticleService.handleEvent(event);
