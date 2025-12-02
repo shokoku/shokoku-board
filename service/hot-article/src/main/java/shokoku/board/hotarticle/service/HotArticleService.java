@@ -39,7 +39,7 @@ public class HotArticleService {
 
   private EventHandler<EventPayload> findEventHandler(Event<EventPayload> event) {
     return eventHandlers.stream()
-            .filter(eventHandler -> eventHandler.support(event))
+            .filter(eventHandler -> eventHandler.supports(event))
             .findAny()
             .orElse(null);
   }

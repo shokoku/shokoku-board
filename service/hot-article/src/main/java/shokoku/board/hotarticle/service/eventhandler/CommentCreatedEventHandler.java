@@ -23,7 +23,7 @@ public class CommentCreatedEventHandler implements EventHandler<CommentCreatedEv
   }
 
   @Override
-  public boolean support(Event<CommentCreatedEventPayload> event) {
+  public boolean supports(Event<CommentCreatedEventPayload> event) {
     return event.getType() == EventType.COMMENT_CREATED;
   }
 

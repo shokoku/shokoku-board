@@ -22,7 +22,7 @@ public class ArticleDeletedEventHandler implements EventHandler<ArticleDeletedEv
   }
 
   @Override
-  public boolean support(Event<ArticleDeletedEventPayload> event) {
+  public boolean supports(Event<ArticleDeletedEventPayload> event) {
     return EventType.ARTICLE_DELETED == event.getType();
   }
 

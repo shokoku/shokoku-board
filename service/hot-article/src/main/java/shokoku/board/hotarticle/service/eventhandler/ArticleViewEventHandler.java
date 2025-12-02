@@ -23,7 +23,7 @@ public class ArticleViewEventHandler implements EventHandler<ArticleViewedEventP
   }
 
   @Override
-  public boolean support(Event<ArticleViewedEventPayload> event) {
+  public boolean supports(Event<ArticleViewedEventPayload> event) {
     return event.getType() == EventType.ARTICLE_VIEWED;
   }
 
