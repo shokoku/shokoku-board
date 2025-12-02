@@ -12,9 +12,12 @@ spring:
       key-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       value-deserializer: org.apache.kafka.common.serialization.StringDeserializer
       enable-auto-commit: false
+
 endpoints:
   shokoku-board-article-service:
     url: http://127.0.0.1:9000
+
+
 
 server:
   port: 9004

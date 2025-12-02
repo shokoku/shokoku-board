@@ -11,7 +11,6 @@ import shokoku.board.hotarticle.repository.HotArticleListRepository;
 import shokoku.board.hotarticle.service.eventhandler.EventHandler;
 import shokoku.board.hotarticle.service.response.HotArticleResponse;
 
-import java.util.ArrayList;
 import java.util.List;
 import java.util.Objects;
 
