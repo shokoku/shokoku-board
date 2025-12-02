@@ -11,11 +11,11 @@ public class DataInitializer {
   RestClient articleServiceClient = RestClient.create("http://localhost:9000");
   RestClient commentServiceClient = RestClient.create("http://localhost:9001");
   RestClient likeServiceClient = RestClient.create("http://localhost:9002");
-  RestClient viewServiceClientClient = RestClient.create("http://localhost:9003");
+  RestClient viewServiceClient = RestClient.create("http://localhost:9003");
 
   @Test
   void initialize() {
-    for (int i=0; i<30; i++) {
+    for(int i=0; i<30; i++) {
       Long articleId = createArticle();
       long commentCount = RandomGenerator.getDefault().nextLong(10);
       long likeCount = RandomGenerator.getDefault().nextLong(10);
@@ -24,14 +24,13 @@ public class DataInitializer {
       createComment(articleId, commentCount);
       like(articleId, likeCount);
       view(articleId, viewCount);
-
     }
   }
 
   Long createArticle() {
     return articleServiceClient.post()
             .uri("/v1/articles")
-            .body(new ArticleCreateRequest("title","content", 1L, 1L))
+            .body(new ArticleCreateRequest("title", "content", 1L, 1L))
             .retrieve()
             .body(ArticleResponse.class)
             .getArticleId();
@@ -52,7 +51,7 @@ public class DataInitializer {
   }
 
   void createComment(Long articleId, long commentCount) {
-    while (commentCount-- > 0) {
+    while(commentCount-- > 0) {
       commentServiceClient.post()
               .uri("/v2/comments")
               .body(new CommentCreateRequest(articleId, "content", 1L))
@@ -69,19 +68,18 @@ public class DataInitializer {
   }
 
   void like(Long articleId, long likeCount) {
-    while (likeCount-- > 0) {
+    while(likeCount-- > 0) {
       likeServiceClient.post()
-            .uri("/v1/article-likes/articles/{articleId}/users/{userId}/pessimistic-lock1", articleId, likeCount)
-            .retrieve();
+              .uri("/v1/article-likes/articles/{articleId}/users/{userId}/pessimistic-lock-1", articleId, likeCount)
+              .retrieve();
     }
   }
 
   void view(Long articleId, long viewCount) {
-    while (viewCount-- > 0) {
-      viewServiceClientClient.post()
-            .uri("/v1/article-views/articles/{articleId}/users/{userId}", articleId, viewCount)
-            .retrieve();
+    while(viewCount-- > 0) {
+      viewServiceClient.post()
+              .uri("/v1/article-views/articles/{articleId}/users/{userId}", articleId, viewCount)
+              .retrieve();
     }
   }
-
 }

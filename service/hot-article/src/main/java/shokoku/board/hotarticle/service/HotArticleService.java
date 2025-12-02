@@ -49,12 +49,10 @@ public class HotArticleService {
   }
 
   public List<HotArticleResponse> readAll(String dataStr) {
-    hotArticleListRepository.readAll(dataStr).stream()
+    return hotArticleListRepository.readAll(dataStr).stream()
             .map(articleClient::read)
             .filter(Objects::nonNull)
             .map(HotArticleResponse::from)
             .toList();
-
-    return null;
   }
 }
