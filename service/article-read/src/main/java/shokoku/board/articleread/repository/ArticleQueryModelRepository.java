@@ -6,7 +6,13 @@ import org.springframework.stereotype.Repository;
 import shokoku.board.common.dataSerializer.DataSerializer;
 
 import java.time.Duration;
+import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
+
+import static java.util.function.Function.*;
+import static java.util.stream.Collectors.toMap;
 
 @Repository
 @RequiredArgsConstructor
@@ -40,8 +46,14 @@ public class ArticleQueryModelRepository {
     return generateKey(articleQueryModel.getArticleId());
   }
 
-  private String generateKey(Long articleId) {
-    return KEY_FORMAT.formatted(articleId);
-  }
+  private String generateKey(Long articleId) {return KEY_FORMAT.formatted(articleId);}
 
+
+  public Map<Long, ArticleQueryModel> readAll(List<Long> articleIds) {
+    List<String> keyList = articleIds.stream().map(this::generateKey).toList();
+      return redisTemplate.opsForValue().multiGet(keyList).stream()
+              .filter(Objects::nonNull)
+              .map(json -> DataSerializer.deserialize(json, ArticleQueryModel.class))
+              .collect(toMap(ArticleQueryModel::getArticleId, identity()));
+  }
 }

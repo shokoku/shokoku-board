@@ -8,15 +8,20 @@ import shokoku.board.articleread.client.ArticleClient;
 import shokoku.board.articleread.client.CommentClient;
 import shokoku.board.articleread.client.LikeClient;
 import shokoku.board.articleread.client.ViewClient;
+import shokoku.board.articleread.repository.ArticleIdListRepository;
 import shokoku.board.articleread.repository.ArticleQueryModel;
 import shokoku.board.articleread.repository.ArticleQueryModelRepository;
+import shokoku.board.articleread.repository.BoardArticleCountRepository;
 import shokoku.board.articleread.service.event.handler.EventHandler;
+import shokoku.board.articleread.service.response.ArticleReadPageResponse;
 import shokoku.board.articleread.service.response.ArticleReadResponse;
 import shokoku.board.common.event.Event;
 import shokoku.board.common.event.EventPayload;
 
 import java.time.Duration;
 import java.util.List;
+import java.util.Map;
+import java.util.Objects;
 import java.util.Optional;
 
 @Slf4j
@@ -29,6 +34,8 @@ public class ArticleReadService {
   private final ViewClient viewClient;
   private final ArticleQueryModelRepository articleQueryModelRepository;
   private final List<EventHandler> eventHandlers;
+  private final ArticleIdListRepository articleIdListRepository;
+  private final BoardArticleCountRepository boardArticleCountRepository;
 
   public void handleEvent(Event<EventPayload> event) {
     for (EventHandler eventHandler : eventHandlers) {
@@ -61,5 +68,67 @@ public class ArticleReadService {
     return articleQueryModelOptional;
   }
 
+  public ArticleReadPageResponse readAll(Long boardId, Long page, Long pageSize) {
+    return ArticleReadPageResponse.of(
+            readAll(
+                    readAllArticleIds(boardId, page, pageSize)
+            ),
+            count(boardId)
+    );
+  }
+
+  private List<ArticleReadResponse> readAll(List<Long> articleIds) {
+    Map<Long, ArticleQueryModel> articleQueryModelMap = articleQueryModelRepository.readAll(articleIds);
+    return articleIds.stream()
+            .map(articleId -> articleQueryModelMap.containsKey(articleId) ?
+                    articleQueryModelMap.get(articleId) :
+                    fetch(articleId).orElse(null))
+            .filter(Objects::nonNull)
+            .map(articleQueryModel ->
+                    ArticleReadResponse.from(
+                            articleQueryModel,
+                            viewClient.count(articleQueryModel.getArticleId())
+                    ))
+            .toList();
+  }
+
+  private List<Long> readAllArticleIds(Long boardId, Long page, Long pageSize) {
+    List<Long> articleIds = articleIdListRepository.readAll(boardId, (page - 1) * pageSize, pageSize);
+    if (pageSize == articleIds.size()) {
+      log.info("[ArticleReadService.readAllArticleIds] return redis data");
+      return articleIds;
+    }
+    log.info("[ArticleReadService.readAllArticleIds] return origin data");
+    return articleClient.readAll(boardId, page, pageSize).getArticles().stream()
+            .map(ArticleClient.ArticleResponse::getArticleId)
+            .toList();
+  }
+
+  private long count(Long boardId) {
+    Long result = boardArticleCountRepository.read(boardId);
+    if (result != null) {
+      return result;
+    }
+    long count = articleClient.count(boardId);
+    return count;
+  }
+
+  public List<ArticleReadResponse> readAllInfiniteScroll(Long boardId, Long lastArticleId, Long pageSize) {
+    return readAll(
+            readAllInfiniteScrollArticleIds(boardId, lastArticleId, pageSize)
+    );
+  }
+
+  private List<Long> readAllInfiniteScrollArticleIds(Long boardId, Long lastArticleId, Long pageSize) {
+    List<Long> articleIds = articleIdListRepository.readAllInfiniteScroll(boardId, lastArticleId, pageSize);
+    if (pageSize == articleIds.size()) {
+      log.info("[ArticleReadService.readAllInfiniteScrollArticleIds] return redis data");
+      return articleIds;
+    }
+    log.info("[ArticleReadService.readAllInfiniteScrollArticleIds] return origin data");
+    return articleClient.readAllInfiniteScroll(boardId, lastArticleId, pageSize).stream()
+            .map(ArticleClient.ArticleResponse::getArticleId)
+            .toList();
+  }
 
 }
